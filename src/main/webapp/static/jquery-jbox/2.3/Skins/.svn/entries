@@ -1,0 +1,107 @@
+10
+
+dir
+10159
+svn://192.168.30.30/yryz/Web/yryzManage/src/main/webapp/static/jquery-jbox/2.3/Skins
+svn://192.168.30.30
+
+
+
+2016-08-29T02:14:15.799392Z
+692
+zhangxiong
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+5d03d7cb-2ccd-4696-8796-f11139385617
+
+Blue
+dir
+
+Bootstrap
+dir
+
+Brown
+dir
+
+Default
+dir
+
+Gray
+dir
+
+GrayCool
+dir
+
+Green
+dir
+
+GreyBlue
+dir
+
+Purple
+dir
+
+Red
+dir
+
+ShareBlue
+dir
+
+ShareBrown
+dir
+
+ShareGreen
+dir
+
+SharePurple
+dir
+
+ShareRed
+dir
+
+样式说明(以Default皮肤为例).css
+file
+
+
+
+
+2016-09-23T06:04:16.771000Z
+f9d918bda0ac6057bd10b4ffc5c64130
+2016-08-29T02:14:15.799392Z
+692
+zhangxiong
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3114
+
