@@ -1,0 +1,30 @@
+.table tbody tr.warning>td {
+	background-color: #f1ceab !important;
+}
+.table tbody tr>td{
+	white-space: nowrap; 
+}
+.table tbody tr>td:last-child{
+	white-space: normal; 
+}
+.table tbody tr>td.column-adjust-ellipsis{
+	max-width:250px;
+	overflow: hidden;
+	text-overflow:ellipsis;
+}
+.td_ground {
+  background-color: #FFDDAA
+}
+
+/* .enlarge_img{
+    -webkit-transition: ease .2s;
+    transition: ease .2s;
+    -webkit-transform-origin:50% 50%; 
+    transform-origin:50% 50%; 
+    width:80;
+    height:80;
+} */
+.enlarge_hover{
+    -webkit-transform: scale(5); /*放大1.2倍*/
+    transform: scale(5); /*放大1.2倍*/
+}

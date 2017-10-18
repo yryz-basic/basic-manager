@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rrz.modules.sys.dao.OpenAccountDao">
+
+<resultMap id="OpenAccountBaseResultMap" type="com.rrz.modules.sys.entity.OpenAccount">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="merchant_id" property="merchantId" jdbcType="BIGINT" />
+		<result column="merchant_name" property="merchantName" jdbcType="VARCHAR" />
+		<result column="card_no" property="cardNo" jdbcType="VARCHAR" />
+		<result column="merchant_phone" property="merchantPhone" jdbcType="VARCHAR" />
+		<result column="merchant_mobile" property="merchantMobile" jdbcType="VARCHAR" />
+		<result column="merchant_desc" property="merchantDesc" jdbcType="VARCHAR" />
+		<result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+		<result column="bank_no" property="bankNo" jdbcType="VARCHAR" />
+		<result column="merchant_type" property="merchantType" jdbcType="TINYINT" />
+		<result column="currency" property="currency" jdbcType="VARCHAR" />
+		<result column="role" property="role" jdbcType="VARCHAR" />
+		<result column="settlement_interval" property="settlementInterval" jdbcType="INTEGER" />
+		<result column="kid" property="kid" jdbcType="BIGINT" />
+	</resultMap>
+
+	<sql id="OpenAccount_List">
+		id,
+		merchant_id,
+		merchant_name,
+		card_no,
+		merchant_phone,
+		merchant_mobile,
+		merchant_desc,
+		bank_name,
+		bank_no,
+		merchant_type,
+		currency,
+		role,
+		settlement_interval,
+		kid
+	</sql>
+	
+	<select id="selectSingleOpenAccountByParams" parameterType="com.rrz.modules.sys.entity.OpenAccount" resultMap="OpenAccountBaseResultMap">
+		select
+		<include refid="OpenAccount_List"/>
+		from open_account
+		<where>
+		1=1
+		<if test="merchantId != null">
+		and merchant_id=#{merchantId,jdbcType=BIGINT}
+		</if>
+		</where>
+	</select>
+
+</mapper>
