@@ -7,7 +7,10 @@
     <dubbo:application name="${dubbo.basic.name}"/>
     <dubbo:registry address="${dubbo.basic.registry}" file="${dubbo.basic.registry.file}"/>
 
-    <!-- email -->
+    <!-- email 配置 -->
     <dubbo:reference id="emailConfigApi" interface="com.yryz.basic.modules.email.api.EmailConfigApi" check="false"/>
+
+    <!-- email 发件人 -->
+    <dubbo:reference id="emailSendApi" interface="com.yryz.basic.modules.email.api.EmailSendApi" check="false"/>
 
 </beans>

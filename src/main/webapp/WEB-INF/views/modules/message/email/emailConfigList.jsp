@@ -13,7 +13,7 @@
         }
 
         function resets() {
-            window.location.href = "${ctx}/email/list";
+            window.location.href = "${ctx}/email/config/list";
         }
         
 
@@ -22,9 +22,9 @@
 <body>
 <ul class="nav nav-tabs">
     <li class="active"><a href="">邮件配置列表</a></li>
-    <li><a href="${ctx}/email/add">增加邮件配置</a></li>
+    <li><a href="${ctx}/email/config/add">增加邮件配置</a></li>
 </ul>
-<form:form id="searchForm" modelAttribute="emailConfigDto" action="${ctx}/email/list" method="post"
+<form:form id="searchForm" modelAttribute="emailConfigDto" action="${ctx}/email/config/list" method="post"
            class="breadcrumb form-search">
     <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
     <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
@@ -64,13 +64,25 @@
             <td>${data.emailCode}</td>
             <td>${data.subject}</td>
             <td>${data.typeModel}</td>
-            <td>${data.emailFlag}</td>
-            <td><fmt:formatDate value="${data.createDate}" pattern="yyyy-MM-dd"/></td>
             <td>
                 <c:choose>
-                    <c:when test="${data.emailFlag eq 1}"><a href="">停用</a></c:when>
-                    <c:otherwise><a href="">启用</a></c:otherwise>
+                    <c:when test="${data.emailFlag eq 1}"><font color="#43CD80">启用</font></c:when>
+                    <c:otherwise><font color="#FF7F00">停用</font></c:otherwise>
                 </c:choose>
+            </td>
+            <td><fmt:formatDate value="${data.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+            <td>
+                <c:choose>
+                    <c:when test="${data.emailFlag eq 1}">
+                        <a href="#" onclick="">停用</a>丨
+                    </c:when>
+                    <c:otherwise>
+                        <a href="#" onclick="">启用</a>丨
+                    </c:otherwise>
+                </c:choose>
+                <a href="#" onclick="edit('${data.id}', '1');">查看</a>丨
+                <a href="#" onclick="edit('${data.id}');">修改</a>丨
+                <a href="#" onclick="del('${data.id}');">删除</a>
             </td>
         </tr>
     </c:forEach>

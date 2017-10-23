@@ -7,22 +7,20 @@
 <script type="text/javascript">
 	
 	$(document).ready(function() {
-        //初始化一个发件人信息
-	    createSendDiv();
 
 		//验证规则
 		var validateForm = $("#searchForm").validate({
 			rules : {
-				clientCode : {
+                emailCode : {
 					required: true,
-					maxlength:50,
+					maxlength:20,
 					remote : {
-						url : "${ctx}/client/checkClientCode",
+						url : "${ctx}/email/config/emailCodeExist",
 						type: "post",
 						dataType: "json",
 						data : {
-							clientCode : function(){
-								return $("#clientCode").val();
+                            emailCode : function(){
+								return $("#emailCode").val();
 							},
 							id : function(){
 								return $("#id").val();
@@ -30,122 +28,145 @@
 						}
 					}
 				},
-				note : {
+                subject : {
 					required: true,
-					maxlength:100
+					maxlength:200
 				},
-				effectiveTime : {
-					required: true
-				},
-				expiryTime : {
-					required: true
-				},
-				
+                emailModel : {
+					required: true,
+                    maxlength:50
+				}
 			},
 			messages : {
-				clientCode : {
-					required: "请输入客户端编码",
-					maxlength: "客户端编码最大50位",
-					remote : "客户端编码已存在"
+                emailCode : {
+					required: "请输入邮件编码",
+					maxlength: "邮件编码最大20位",
+					remote : "邮件编码已存在，请重新输入"
 				},
-				note : {
-					required: "请输入客户端名称",
-					maxlength:"客户端名称最大100"
+                subject : {
+					required: "请输入主题",
+					maxlength:"主题最大200"
 				},
-				effectiveTime : {
-					required: "请输入生效日期"
-				},
-				expiryTime : {
-					required: "请输入失效日期"
+                emailModel : {
+					required: "请输入邮件模版",
+                    maxlength:"邮件模版最大50"
 				}
 			}
 		});
 
-		//保存按钮
-		$("#btnSubmit").click(function(){
-			if (!validateForm.form()) {
-				return;
-			}
-			var r = confirm('是否确认保存');
-			if(r){
-				$.ajax({
-		            type:"post",
-		            url:"${ctx}/client/save",
-		            dataType:"json",
-		            data:$("#searchForm").serialize(),
-		            success:function(data){
-		            	if(data == 1){
-							alert("保存成功");
-							window.location.href = "${ctx}/client/list";
-						}else{
-							alert("保存失败");
-						}
-		            }
-		        });
-			}
-			
-		});
+        //保存按钮
+        $("#btnSubmit").click(function(){
+            if (!validateForm.form()) {
+                return;
+            }
+            //获取发件人
+            var sendInfo = getEmailDiv($("#sendDiv"));
+            if(!sendInfo){
+                alertx('发件人不能为空');
+                return;
+            }
+            //获取收件人
+            var receiverList = getEmailDiv($("#receiverDiv"));
+            if(!receiverList){
+                alertx('收件人不能为空');
+                return;
+            }
+            var r = confirm('是否确认保存');
+            if(r){
+                var data = $("#searchForm").serialize();
+                //设置发送人信息
+                data += "&sendInfo="+sendInfo;
+                //设置收件人信息
+                data += "&receiverList="+receiverList;
+
+                $.ajax({
+                    type:"post",
+                    url:"${ctx}/email/config/submit",
+                    dataType:"json",
+                    data:data,
+                    success:function(data){
+                        if(data == '1'){
+                            alert("保存成功");
+                            window.location.href = "${ctx}/email/config/list";
+                        }else if(data == '0'){
+                            alert("保存失败");
+                        }else{
+                            alert(data);
+                        }
+                    }
+                });
+            }
+
+        });
 
 		//发件人账号
 		$("#account").select2({
             language: "zh-CN",
             minimumInputLength: 1,
-            placeholder: "-- 请输入昵称搜索 --",
-            tags: true,
+            placeholder: "-- 请输入邮箱进行搜索 --",
             multiple: true,
             ajax: {
-                url : "",
+                url : "${ctx}/email/send/accountSelect",
                 dataType: "json",
                 delay: 500,
                 data: function (params) {
-                    return {nickname: params.term};
+                    return {account: params};
                 },
-                processResults: function (res, params) {
+                results: function (res, page) {
+                    console.log(res);
                     var options = [];
                     $(res).each(function (index, r) {
-                        var option = {"id": r.key, "text": r.value};
+                        var option = {"id": r.account, "text": r.account};
                         options.push(option);
                     });
                     return {
                         results: options
                     };
-                },
-                escapeMarkup: function (m) {
-                    return m;
                 }
+            },
+            escapeMarkup: function (m) {
+                return m;
             }
         });
 
+		//发件人账号选择事件
+        $("#account").change(function(e){
+            var account = $("#account").val();
+            if(account){
+                $("#sendDiv").append(createEmailDiv(account));
+            }
+            $(".select2-search-choice-close").click();
+        });
+
+        //收件人回车事件
+        $("#receiverInput").keydown(function(e){
+            if(e.keyCode==13){
+                createReceiverDiv();
+            }
+        });
 	});
 
-	//创建发件人div
-	function createSendDiv(){
-	    var html = '\
-	        <div style="margin-left: 160px; margin-top: 10px;">\
-                <input type="text" placeholder="发件人账号">\
-                <input type="password" placeholder="发件人密码">\
-                <input type="text" placeholder="smtp服务器地址">\
-                <input type="hidden" value="true">\
-                <input id="delSendbutton" class="btn btn-primary" type="button" value="删除" onclick="delParentDiv(this)">\
-	        </div>\
-	    ';
-        $("#sendDiv").append(html);
+	//创建emailDiv
+    function createEmailDiv(emailAccount) {
+        if(!emailAccount){
+            return false;
+        }
+        var html = '\
+        <span style="background-color: gray;display: inline-block;line-height: 25px;padding: 0 5px;margin-bottom: 5px;">\
+            <span style="color: white;">'+emailAccount+'</span>\
+            <span style="color: white;cursor: pointer" onclick="delParentDiv(this)">X</span>\
+        </span>\
+        ';
+
+        return html;
     }
 
     //创建收件人div
     function createReceiverDiv(){
 	    var receiverInput = $("#receiverInput").val();
-	    if(!receiverInput){
-            alertx('请输入收件人信息');
-            return false;
+	    if(receiverInput){
+            $("#receiverDiv").append(createEmailDiv(receiverInput));
         }
-        var html = '\
-        <span style="background-color: gray;display: inline-block;line-height: 25px;padding: 0 5px;margin-bottom: 5px;">\
-            <span style="color: white;">'+receiverInput+'</span>\
-            <span style="color: white;cursor: pointer" onclick="delParentDiv(this)">X</span>\
-        </span>\
-        ';
-        $("#receiverDiv").append(html);
         $("#receiverInput").val('');
     }
 
@@ -154,13 +175,27 @@
         $(obj).parent().remove();
     }
 
+    function getEmailDiv(obj){
+        var email = "";
+        var span = obj.children("span");
+        $(span).each(function (index, r) {
+            if(!email){
+                email = $(r).find("span").eq(0).html();
+            }else{
+                email += "," + $(r).find("span").eq(0).html();
+            }
+        });
+
+        return email;
+    }
+
 </script>
 
 </head>
 <body>
     <ul class="nav nav-tabs">
         <li class="active">
-            <a href="${ctx}/email/list">邮件配置列表</a>
+            <a href="${ctx}/email/config/list">邮件配置列表</a>
         </li>
         <li class="active">
             <a><c:choose>
@@ -176,14 +211,12 @@
         	<form:input path="emailCode" id="emailCode" name="emailCode" value="${emailConfigDto.emailCode }"
         	htmlEscape="false" class="input-medium" placeholder="邮件编码需全局唯一" />
         </div>
-        <div id="sendDiv" class="control-group">
+        <div class="control-group">
             <div>
                 <lable class="control-label">发件人信息：</lable>
-                <select id="account" name="account" class="input-medium" multiple="multiple">
-
-                </select>
-                <%--<a class="btn btn-small" href="javascript:createSendDiv();"><i class="icon-plus" style="margin-right: 5px;"></i>发件人</a>--%>
+                <input id="account" name="account" class="input-medium" multiple="multiple" style="width:200px;"></input>
             </div>
+            <div id="sendDiv" style="margin-left:160px;margin-top: 10px;"></div>
         </div>
         <div class="control-group">
             <lable class="control-label">邮件主题：</lable>
