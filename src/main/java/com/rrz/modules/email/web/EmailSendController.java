@@ -39,7 +39,7 @@ public class EmailSendController extends BaseController {
     }
 
     @RequestMapping(value="/add")
-    public String add(Long id, Integer operateId , Model model) {
+    public String add(Long id, Integer operateId, Model model) {
         EmailSendVo emailSend = new EmailSendVo();
         if(id != null){
             emailSend = emailSendApi.detail(id);

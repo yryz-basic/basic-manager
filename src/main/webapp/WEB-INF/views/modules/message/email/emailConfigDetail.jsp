@@ -7,6 +7,19 @@
 <script type="text/javascript">
 	
 	$(document).ready(function() {
+        //配置id
+        var id = "${emailConfigDto.id}";
+        if(id){
+            $("#emailCode").attr("readonly", "readonly");
+        }
+
+        //如果是查看操作，不能修改任何东西
+        var operateId = "${operateId}";
+        if(operateId){
+            $("input").attr("readonly", "readonly");
+            $("select").attr("readonly", "readonly");
+            $("#btnSubmit").css("display", "none");
+        }
 
 		//验证规则
 		var validateForm = $("#searchForm").validate({
@@ -53,6 +66,11 @@
 				}
 			}
 		});
+
+        $.validator.addMethod("checkEmailCode", function(value,element){
+            var checkEmailCode = /^[0-9A-Za-z_-]{1,20}$/;
+            return this.optional(element)||(checkEmailCode.test(value));
+        },"邮件编码只能是数字和字母，最大20位");
 
         //保存按钮
         $("#btnSubmit").click(function(){
@@ -209,18 +227,30 @@
         <div class="control-group">
         	<lable class="control-label">邮件编码：</lable>
         	<form:input path="emailCode" id="emailCode" name="emailCode" value="${emailConfigDto.emailCode }"
-        	htmlEscape="false" class="input-medium" placeholder="邮件编码需全局唯一" />
+        	htmlEscape="false" class="input-medium checkEmailCode" placeholder="邮件编码需全局唯一" />
         </div>
         <div class="control-group">
             <div>
                 <lable class="control-label">发件人信息：</lable>
                 <input id="account" name="account" class="input-medium" multiple="multiple" style="width:200px;"></input>
             </div>
-            <div id="sendDiv" style="margin-left:160px;margin-top: 10px;"></div>
+            <div id="sendDiv" style="margin-left:160px;margin-top: 10px;">
+                <c:if test="${not empty emailConfigDto.sendInfo}">
+                    <c:set value="${ fn:split(emailConfigDto.sendInfo, ',') }" var="names" />
+                    <c:forEach items="${names}" var="data" varStatus="i">
+                        <span style="background-color: gray;display: inline-block;line-height: 25px;padding: 0 5px;margin-bottom: 5px;">
+                            <span style="color: white;">${data}</span>
+                            <c:if test="${empty operateId}">
+                                <span style="color: white;cursor: pointer" onclick="delParentDiv(this)">X</span>
+                            </c:if>
+                        </span>
+                    </c:forEach>
+                </c:if>
+            </div>
         </div>
         <div class="control-group">
             <lable class="control-label">邮件主题：</lable>
-            <input id="subject" name="subject" style="width: 400px;" type="text" >
+            <input id="subject" name="subject" style="width: 400px;" type="text" value="${emailConfigDto.subject}">
         </div>
         <div class="control-group">
             <div>
@@ -228,7 +258,19 @@
                 <input id="receiverInput" type="text" placeholder="收件人账号">
                 <a class="btn btn-small" href="javascript:createReceiverDiv();"><i class="icon-plus" style="margin-right: 5px;"></i>收件人</a>
             </div>
-            <div id="receiverDiv" style="margin-left:160px;margin-top: 10px;"></div>
+            <div id="receiverDiv" style="margin-left:160px;margin-top: 10px;">
+                <c:if test="${not empty emailConfigDto.receiverList}">
+                    <c:set value="${ fn:split(emailConfigDto.receiverList, ',') }" var="names" />
+                    <c:forEach items="${names}" var="data" varStatus="i">
+                        <span style="background-color: gray;display: inline-block;line-height: 25px;padding: 0 5px;margin-bottom: 5px;">
+                            <span style="color: white;">${data}</span>
+                            <c:if test="${empty operateId}">
+                                <span style="color: white;cursor: pointer" onclick="delParentDiv(this)">X</span>
+                            </c:if>
+                        </span>
+                    </c:forEach>
+                </c:if>
+            </div>
         </div>
         <div class="control-group">
             <lable class="control-label">模版类型：</lable>
@@ -239,7 +281,7 @@
         </div>
         <div class="control-group">
             <lable class="control-label">邮件模版：</lable>
-            <input id="emailModel" name="emailModel" type="text" placeholder="template中配置的ftl文件名">
+            <input id="emailModel" name="emailModel" type="text" placeholder="template中配置的ftl文件名" value="${emailConfigDto.emailModel}">
         </div>
         <div class="control-group">
         	<lable class="control-label">邮件状态：</lable>

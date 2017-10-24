@@ -38,9 +38,14 @@ public class EmailConfigController extends BaseController {
     }
 
     @RequestMapping(value="/add")
-    public String add(EmailConfig emailConfig, Model model) {
+    public String add(Long id, Integer operateId, Model model) {
+        EmailConfigVo config = new EmailConfigVo();
+        if(id != null){
+            config = emailConfigApi.detail(id);
+        }
 
-        model.addAttribute("emailConfigDto", new EmailConfigVo());
+        model.addAttribute("emailConfigDto", config);
+        model.addAttribute("operateId", operateId);
         return "modules/message/email/emailConfigDetail";
     }
 

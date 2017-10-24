@@ -12,10 +12,60 @@
             return false;
         }
 
+        function edit(id, operateId) {
+            var url = "${ctx}/email/config/add?id="+id;
+            if(operateId){
+                url += "&operateId="+operateId
+            }
+            window.location.href = url;
+        }
+
         function resets() {
             window.location.href = "${ctx}/email/config/list";
         }
-        
+
+        function statusFlag(id, emailFlag) {
+            var msg = emailFlag == '1' ? "是否确认启用" : "是否确认停用";
+            var r = confirm(msg);
+            if(r){
+                $.ajax({
+                    type:"post",
+                    url:"${ctx}/email/config/submit",
+                    dataType:"json",
+                    data:{id : id, emailFlag : emailFlag},
+                    success:function(data){
+                        if(data == '1'){
+                            window.location.href = "${ctx}/email/config/list";
+                        }else if(data == '0'){
+                            alert("状态变更失败");
+                        }else{
+                            alert(data);
+                        }
+                    }
+                });
+            }
+        }
+
+        function del(id) {
+            var r = confirm('是否确认删除');
+            if(r){
+                $.ajax({
+                    type:"post",
+                    url:"${ctx}/email/config/submit",
+                    dataType:"json",
+                    data:{id : id, delFlag : 1},
+                    success:function(data){
+                        if(data == '1'){
+                            window.location.href = "${ctx}/email/config/list";
+                        }else if(data == '0'){
+                            alert("删除失败");
+                        }else{
+                            alert(data);
+                        }
+                    }
+                });
+            }
+        }
 
     </script>
 </head>
@@ -74,10 +124,10 @@
             <td>
                 <c:choose>
                     <c:when test="${data.emailFlag eq 1}">
-                        <a href="#" onclick="">停用</a>丨
+                        <a href="#" onclick="statusFlag('${data.id}', '0')">停用</a>丨
                     </c:when>
                     <c:otherwise>
-                        <a href="#" onclick="">启用</a>丨
+                        <a href="#" onclick="statusFlag('${data.id}', '1')">启用</a>丨
                     </c:otherwise>
                 </c:choose>
                 <a href="#" onclick="edit('${data.id}', '1');">查看</a>丨

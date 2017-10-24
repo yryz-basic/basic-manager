@@ -39,7 +39,8 @@
 							    return $("#id").val();
                             }
 						}
-					}
+					},
+                    email: true
 				},
                 password : {
 					required: true,
@@ -57,7 +58,8 @@
                 account : {
 					required: "请输入账号",
 					maxlength: "账号最大50位",
-					remote : "账号已存在，请重新输入"
+					remote : "账号已存在，请重新输入",
+                    email : "请检查电子邮件的格式"
 				},
                 password : {
 					required: "请输入密码",
